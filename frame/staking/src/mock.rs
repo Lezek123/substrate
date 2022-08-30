@@ -41,6 +41,7 @@ use std::cell::RefCell;
 
 pub const INIT_TIMESTAMP: u64 = 30_000;
 pub const BLOCK_TIME: u64 = 1000;
+pub const RESTRICTED_ACCOUNT: AccountId = 55500;
 
 /// The AccountId alias in this test module.
 pub(crate) type AccountId = u64;
@@ -302,6 +303,7 @@ impl crate::pallet::pallet::Config for Test {
 	type OnStakerSlash = OnStakerSlashMock<Test>;
 	type BenchmarkingConfig = TestBenchmarkingConfig;
 	type WeightInfo = ();
+	type BondingRestriction = AccountRestricted555;
 }
 
 impl<LocalCall> frame_system::offchain::SendTransactionTypes<LocalCall> for Test
@@ -886,4 +888,12 @@ pub(crate) fn staking_events() -> Vec<crate::Event<Test>> {
 
 pub(crate) fn balances(who: &AccountId) -> (Balance, Balance) {
 	(Balances::free_balance(who), Balances::reserved_balance(who))
+}
+
+pub struct AccountRestricted555;
+
+impl BondingRestriction<AccountId> for AccountRestricted555 {
+	fn can_bond(stash: &AccountId, controller: &AccountId) -> bool {
+		!(*stash == RESTRICTED_ACCOUNT || *controller == RESTRICTED_ACCOUNT)
+	}
 }
