@@ -5155,25 +5155,14 @@ fn bond_restriction_works() {
 			),
 			Error::<Test>::BondingRestricted
 		);
-		assert_err!(
-			Staking::bond(
-				Origin::signed(1),
-				RESTRICTED_ACCOUNT,
-				1000,
-				RewardDestination::Controller
-			),
-			Error::<Test>::BondingRestricted
-		);
 
 		// put some money in account that we'll use.
-		for i in RESTRICTED_ACCOUNT + 1..RESTRICTED_ACCOUNT + 2 {
-			let _ = Balances::make_free_balance_be(&i, 2000);
-		}
+		let _ = Balances::make_free_balance_be(&(RESTRICTED_ACCOUNT + 1), 2000);
 
-		// Using unrestricted accounts should not fail
+		// Using unrestricted account should not fail
 		assert_ok!(Staking::bond(
 			Origin::signed(RESTRICTED_ACCOUNT + 1),
-			RESTRICTED_ACCOUNT + 2,
+			1,
 			1000,
 			RewardDestination::Controller
 		));

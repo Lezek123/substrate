@@ -921,15 +921,15 @@ impl BenchmarkingConfig for TestBenchmarkingConfig {
 /// Means for checking if there is any external restriction on bonding with a specific account
 ///
 /// Allows for parts of the runtime that might implement other forms of fund locking to prevent
-/// incompatible locking on accounts which could lead to unsafe state.
+/// incompatible locking on a stash account which could lead to unsafe state.
 pub trait BondingRestriction<AccountId> {
 	/// Determine if bonding is allowed with stash and controller combination
-	fn can_bond(stash: &AccountId, controller: &AccountId) -> bool;
+	fn can_bond(stash: &AccountId) -> bool;
 }
 
 // No restrictions
 impl<AccountId> BondingRestriction<AccountId> for () {
-	fn can_bond(_stash: &AccountId, _controller: &AccountId) -> bool {
+	fn can_bond(_stash: &AccountId) -> bool {
 		true
 	}
 }

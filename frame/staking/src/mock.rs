@@ -892,9 +892,9 @@ pub(crate) fn balances(who: &AccountId) -> (Balance, Balance) {
 
 pub struct AccountRestricted555;
 
-// Restrict both stash and controller accounts
+// Restrict stash account
 impl BondingRestriction<AccountId> for AccountRestricted555 {
-	fn can_bond(stash: &AccountId, controller: &AccountId) -> bool {
-		!(*stash == RESTRICTED_ACCOUNT || *controller == RESTRICTED_ACCOUNT)
+	fn can_bond(stash: &AccountId) -> bool {
+		*stash != RESTRICTED_ACCOUNT
 	}
 }

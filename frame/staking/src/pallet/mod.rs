@@ -708,7 +708,7 @@ pub mod pallet {
 		TooManyValidators,
 		/// Commission is too low. Must be at least `MinCommission`.
 		CommissionTooLow,
-		/// External restriction prevents bonding with given accounts
+		/// External restriction prevents bonding with given account
 		BondingRestricted,
 	}
 
@@ -793,7 +793,7 @@ pub mod pallet {
 				return Err(Error::<T>::AlreadyPaired.into())
 			}
 
-			if !T::BondingRestriction::can_bond(&stash, &controller) {
+			if !T::BondingRestriction::can_bond(&stash) {
 				return Err(Error::<T>::BondingRestricted.into())
 			}
 
