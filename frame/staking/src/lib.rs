@@ -927,7 +927,7 @@ pub trait BondingRestriction<AccountId> {
 	fn can_bond(stash: &AccountId, controller: &AccountId) -> bool;
 }
 
-// Default implementation when no external restrictions ex
+// No restrictions
 impl<AccountId> BondingRestriction<AccountId> for () {
 	fn can_bond(_stash: &AccountId, _controller: &AccountId) -> bool {
 		true

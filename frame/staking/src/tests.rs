@@ -5145,6 +5145,7 @@ fn proportional_ledger_slash_works() {
 #[test]
 fn bond_restriction_works() {
 	ExtBuilder::default().build_and_execute(|| {
+		start_session(2);
 		assert_err!(
 			Staking::bond(
 				Origin::signed(RESTRICTED_ACCOUNT),
@@ -5163,5 +5164,18 @@ fn bond_restriction_works() {
 			),
 			Error::<Test>::BondingRestricted
 		);
+
+		// put some money in account that we'll use.
+		for i in RESTRICTED_ACCOUNT + 1..RESTRICTED_ACCOUNT + 2 {
+			let _ = Balances::make_free_balance_be(&i, 2000);
+		}
+
+		// Using unrestricted accounts should not fail
+		assert_ok!(Staking::bond(
+			Origin::signed(RESTRICTED_ACCOUNT + 1),
+			RESTRICTED_ACCOUNT + 2,
+			1000,
+			RewardDestination::Controller
+		));
 	});
 }
