@@ -918,7 +918,7 @@ impl BenchmarkingConfig for TestBenchmarkingConfig {
 	type MaxNominators = frame_support::traits::ConstU32<100>;
 }
 
-/// Means for checking if there is any external restriction on bonding with a specific accounts
+/// Means for checking if there is any external restriction on bonding with a specific account
 ///
 /// Allows for parts of the runtime that might implement other forms fund locking to prevent
 /// incompatible locking on accounts which could lead to unsafe state.
