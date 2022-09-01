@@ -20,7 +20,7 @@
 use super::{ConfigOp, Event, MaxUnlockingChunks, *};
 use frame_election_provider_support::{ElectionProvider, SortedListProvider, Support};
 use frame_support::{
-	assert_noop, assert_ok, assert_storage_noop, bounded_vec,
+	assert_err, assert_noop, assert_ok, assert_storage_noop, bounded_vec,
 	dispatch::WithPostDispatchInfo,
 	pallet_prelude::*,
 	traits::{Currency, Get, ReservableCurrency},
@@ -5140,4 +5140,31 @@ fn proportional_ledger_slash_works() {
 		LedgerSlashPerEra::get().1,
 		BTreeMap::from([(4, 0), (5, value_slashed), (6, 0), (7, 0)])
 	);
+}
+
+#[test]
+fn bond_restriction_works() {
+	ExtBuilder::default().build_and_execute(|| {
+		start_session(2);
+		assert_err!(
+			Staking::bond(
+				Origin::signed(RESTRICTED_ACCOUNT),
+				1,
+				1000,
+				RewardDestination::Controller
+			),
+			Error::<Test>::BondingRestricted
+		);
+
+		// put some money in account that we'll use.
+		let _ = Balances::make_free_balance_be(&(RESTRICTED_ACCOUNT + 1), 2000);
+
+		// Using unrestricted account should not fail
+		assert_ok!(Staking::bond(
+			Origin::signed(RESTRICTED_ACCOUNT + 1),
+			1,
+			1000,
+			RewardDestination::Controller
+		));
+	});
 }

@@ -40,10 +40,10 @@ mod impls;
 pub use impls::*;
 
 use crate::{
-	slashing, weights::WeightInfo, ActiveEraInfo, BalanceOf, EraPayout, EraRewardPoints, Exposure,
-	Forcing, MaxUnlockingChunks, NegativeImbalanceOf, Nominations, PositiveImbalanceOf, Releases,
-	RewardDestination, SessionInterface, StakingLedger, UnappliedSlash, UnlockChunk,
-	ValidatorPrefs,
+	slashing, weights::WeightInfo, ActiveEraInfo, BalanceOf, BondingRestriction, EraPayout,
+	EraRewardPoints, Exposure, Forcing, MaxUnlockingChunks, NegativeImbalanceOf, Nominations,
+	PositiveImbalanceOf, Releases, RewardDestination, SessionInterface, StakingLedger,
+	UnappliedSlash, UnlockChunk, ValidatorPrefs,
 };
 
 const STAKING_ID: LockIdentifier = *b"staking ";
@@ -200,6 +200,9 @@ pub mod pallet {
 
 		/// Weight information for extrinsics in this pallet.
 		type WeightInfo: WeightInfo;
+
+		/// Interface for doing bonding restriction check
+		type BondingRestriction: BondingRestriction<Self::AccountId>;
 	}
 
 	#[pallet::type_value]
@@ -705,6 +708,8 @@ pub mod pallet {
 		TooManyValidators,
 		/// Commission is too low. Must be at least `MinCommission`.
 		CommissionTooLow,
+		/// External restriction prevents bonding with given account
+		BondingRestricted,
 	}
 
 	#[pallet::hooks]
@@ -786,6 +791,10 @@ pub mod pallet {
 
 			if <Ledger<T>>::contains_key(&controller) {
 				return Err(Error::<T>::AlreadyPaired.into())
+			}
+
+			if !T::BondingRestriction::can_bond(&stash) {
+				return Err(Error::<T>::BondingRestricted.into())
 			}
 
 			// Reject a bond which is considered to be _dust_.
